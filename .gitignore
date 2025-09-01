@@ -1,0 +1,89 @@
+# -------------------------------------------------------
+# Archivos de entorno y credenciales
+# -------------------------------------------------------
+.env
+.env.*
+/config/master.key
+
+# -------------------------------------------------------
+# Dependencias
+# -------------------------------------------------------
+/.bundle
+/vendor/bundle
+/node_modules
+/yarn-debug.log*
+/yarn-error.log*
+
+# -------------------------------------------------------
+# Archivos temporales y logs
+# -------------------------------------------------------
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
+
+# PIDs y storage temporal
+/tmp/pids/*
+!/tmp/pids/.keep
+/tmp/storage/*
+!/tmp/storage/.keep
+
+# Storage local (uploads en dev/test)
+/storage/*
+!/storage/.keep
+
+# -------------------------------------------------------
+# Archivos generados automáticamente
+# -------------------------------------------------------
+*.rbc
+capybara-*.html
+.rspec
+/db/*.sqlite3
+/db/*.sqlite3-journal
+/db/*.sqlite3-*
+/public/assets
+/public/packs
+/public/packs-test
+/public/system
+/public/uploads
+.byebug_history
+.pry_history
+
+# -------------------------------------------------------
+# Sistema operativo / editor
+# -------------------------------------------------------
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# -------------------------------------------------------
+# Cobertura y testing
+# -------------------------------------------------------
+/coverage/
+/spec/tmp
+rspec_failures
+rerun.txt
+
+# -------------------------------------------------------
+# Archivos de documentación local
+# -------------------------------------------------------
+/doc/
+/tmp/docs
+
+# -------------------------------------------------------
+# Archivos de IDEs / entornos
+# -------------------------------------------------------
+.idea/
+.vscode/
+.project
+/.metadata
+*.iml
+
+# -------------------------------------------------------
+# Docker
+# -------------------------------------------------------
+*.pid
+*.seed
+docker-compose.override.yml
