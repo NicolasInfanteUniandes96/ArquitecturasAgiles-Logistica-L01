@@ -20,7 +20,7 @@ class LogisticController < ApplicationController
 
     # (E) Respuesta del calculo del algoritmo
     render json: {
-      visit_order:     result[:visit_order],    # array: ["E","P10",...,"E"]
+      visit_order:     result[:visit_order].join(","),    # array: ["E","P10",...,"E"]
       visit_order_str: order_str,               # string: "E>P10>...>E"
       cost:            result[:cost],           # número
       hash:            Digest::SHA256.hexdigest(order_str)
