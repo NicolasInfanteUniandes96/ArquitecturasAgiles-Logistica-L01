@@ -13,17 +13,12 @@ class LogisticController < ApplicationController
     planner = Logistics::RoutePlanner.new
     result  = planner.compute(items: items)     # repuesta del algoritmo 3-OPT
 
-    # (D) Construir ayudas para el Voting:
-    #     - visit_order_str: fácil de comparar como string en el voter
-    #     - hash: SHA256 del string (si prefieren comparar por hash)
-    order_str = result[:visit_order].join(">")
+    # (D) Construir String sin espacios para el Voting:
+    order_str = result[:visit_order].join(",")
 
     # (E) Respuesta del calculo del algoritmo
     render json: {
-      visit_order:     result[:visit_order].join(","),    # array: ["E","P10",...,"E"]
-      visit_order_str: order_str,               # string: "E>P10>...>E"
-      cost:            result[:cost],           # número
-      hash:            Digest::SHA256.hexdigest(order_str)
+      route:   order_str,    # array: ["E","P10",...,"E"]
     }, status: 200
 
   rescue Logistics::UnknownNodeError, ArgumentError => e
