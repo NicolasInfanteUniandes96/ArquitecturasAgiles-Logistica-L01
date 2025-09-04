@@ -1,111 +1,35 @@
+# docker-compose.yml
+version: "3.9"
 services:
-  auth:
-    # container_name: orion_nms_backend_apigateway
-    build: ./
-    command: bash -c "rm -f tmp/pids/server .pid && bundle exec rails db:create db:migrate && bundle exec rails server -b '0.0.0.0' -p 3001"
-    volumes:
-      - ./:/app
-    ports:
-      - "3001:3001"
-    environment:
-      DEV_USER_DB: postgres
-      DEV_PASS_DB: postgres
-      DEV_HOST_DB: db_auth
-      TEST_USER_DB: postgres
-      TEST_PASS_DB: postgres
-      TEST_HOST_DB: db_auth
-      NMS_AUTH_DATABASE_PASSWORD: postgres
-      KEYCLOAK_URL: http://keycloak_auth:8080
-      KEYCLOAK_REALM: nms
-      KEYCLOAK_CLIENT_ID: orion-nms
-      KEYCLOAK_CLIENT_SECRET: 65BIuEYYBTAU5Axgs8j7mqQfJ6ZTQlZz
-      RAILS_ENV: development
-      ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY: MN3dYV6JWowzqAATPu6Bw2YpKvzp5LVV
-      ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY: 4c22g6jwvFZJebjy9K4yxe3ohdU8kzgO
-      ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT: v5Dls0ToUZ9ibVCIVzVuzbb7hTzoKHNY
-      MAILER_ADDRESS: http://mailhog
-      MAILER_PORT: 1025
-      MAILER_USERNAME:
-      MAILER_PASSWORD:
-      MAILER_DOMAIN: localhost
-      MAILER_AUTH_METHOD: plain
-      MAILER_ENABLE_STARTTLS_AUTO: false
-
-    depends_on:
-      - db_auth
-      - keycloak_auth
-    networks:
-      - sharednet
-
-  keycloak_auth:
-    image: quay.io/keycloak/keycloak:26.2
-    container_name: keycloak_auth
-    environment:
-      KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://db_keycloack:5432/keycloak
-      KC_DB_USERNAME: keycloak
-      KC_DB_PASSWORD: keycloak_password
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin_password
-      KC_HOSTNAME_STRICT: false
-      KC_HOSTNAME_STRICT_HTTPS: false
-      KC_HTTP_ENABLED: true
-      # Importar realm al arrancar
-      KC_IMPORT: /opt/keycloak/data/import/configuration-keycloak.json
-    volumes:
-      # Montamos el JSON dentro del contenedor en la ruta donde Keycloak lo busca por defecto
-      - ./configuration-keycloak.json:/opt/keycloak/data/import/configuration-keycloak.json:ro
-    command:
-      - start-dev
-      - --import-realm
-      - --verbose
-    ports:
-      - "8080:8080"
-    depends_on:
-      - db_keycloack
-    networks:
-      - sharednet
-
-  mailhog:
-    image: mailhog/mailhog
-    container_name: mailhog
-    ports:
-      - "1025:1025" # Puerto SMTP
-      - "8025:8025" # Interfaz web
-    networks:
-      - sharednet
-
-  db_auth:
-    image: postgres:16.8
-    volumes:
-      - auth_data:/var/lib/postgresql/data
+  db:
+    image: postgres:16
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: ms_auth_development
-    ports:
-      - "5433:5432"
-    networks:
-      - sharednet
-
-  db_keycloack:
-    image: postgres:16.8
-    environment:
-      POSTGRES_USER: keycloak
-      POSTGRES_PASSWORD: keycloak_password
-      POSTGRES_DB: keycloak
+      POSTGRES_DB: logistica_l01_development  
     volumes:
-      - keycloak_data:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql/data
     ports:
-      - "5436:5432"
-    networks:
-      - sharednet
+      - "5432:5432"
+
+  app:
+    build:
+      context: .
+      dockerfile: dev.dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      RAILS_ENV: development
+      DEV_USER_DB: postgres
+      DEV_PASS_DB: postgres
+      DEV_HOST_DB: db                # ← host = nombre del servicio
+    volumes:
+      - .:/rails:cached
+      - bundle_cache:/usr/local/bundle
+    command: bash -lc "bundle install && rm -f tmp/pids/server.pid && bin/rails s -b 0.0.0.0 -p 3001"
+    depends_on:
+      - db
 
 volumes:
-  auth_data:
-  keycloak_data:
-
-networks:
-  sharednet:
-    external: true
-    name: auth
+  bundle_cache:
+  db_data:
